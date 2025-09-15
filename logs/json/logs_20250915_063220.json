@@ -1,0 +1,6 @@
+[
+    {
+        "event": "login",
+        "user": "bob"
+    }
+]

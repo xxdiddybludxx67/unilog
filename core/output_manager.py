@@ -1,10 +1,13 @@
+# Compatibility function for cli/tail.py
+def send_to_output(records, output_type):
+    OutputManager([output_type]).write(records)
 import os
 from typing import List, Dict, Optional
 from core.logger import log
-from outputs import json as json_output
-from outputs import csv as csv_output
-from outputs import parquet as parquet_output
-from outputs import elastic as elastic_output
+from outputs import json_output
+from outputs import csv_output
+from outputs import parquet_output
+from outputs import elastic_output
 from cloud import s3, gcp, azure
 
 # Default output directory

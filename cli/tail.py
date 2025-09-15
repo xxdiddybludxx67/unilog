@@ -1,9 +1,9 @@
 import time
 from pathlib import Path
-from core.parser_manager import get_parser
+from core.parser_manager import ParserManager
 from core.filter import apply_filter
 from core.output_manager import send_to_output
-from ml.anomaly_detection import detect as detect_anomalies
+from ml.anomaly_detection import AnomalyDetector
 from core.logger import log
 
 
@@ -29,7 +29,7 @@ class LogTailer:
             return []
 
     def parse_lines(self, lines):
-        parser = get_parser(self.parser_type)
+        parser = ParserManager().parsers.get(self.parser_type, lambda x: x)
         for line in lines:
             try:
                 record = parser(line)
@@ -42,8 +42,10 @@ class LogTailer:
     def run_ml(self):
         if self.enable_ml and self.parsed_data:
             log("Running anomaly detection on tailed data")
-            anomalies = detect_anomalies(self.parsed_data)
-            log(f"Detected {len(anomalies)} anomalies")
+            detector = AnomalyDetector()
+            detector.fit(self.parsed_data)
+            anomalies = detector.predict(self.parsed_data)
+            log(f"Detected {sum(1 for a in anomalies if a.get('anomaly'))} anomalies")
             return anomalies
         return []
 

@@ -1,20 +1,20 @@
 from typing import Dict, Any, Callable
-from parsers import json as json_parser
-from parsers import nginx as nginx_parser
-from parsers import apache as apache_parser
-from parsers import syslog as syslog_parser
-from parsers import postgres as postgres_parser
-from parsers import generic as generic_parser
+from parsers.json_parser import JSONParser
+from parsers.nginx import NginxParser
+from parsers.apache import ApacheParser
+# from parsers.postgres import PostgresParser  # Uncomment if exists
+from parsers.syslog import SyslogParser
+from parsers.generic import GenericParser
 from core.logger import log
 
 # Registry of available parsers
 PARSER_REGISTRY: Dict[str, Callable[[str], Dict[str, Any]]] = {
-    "json": json_parser.parse,
-    "nginx": nginx_parser.parse,
-    "apache": apache_parser.parse,
-    "syslog": syslog_parser.parse,
-    "postgres": postgres_parser.parse,
-    "generic": generic_parser.parse,
+    "json": JSONParser().parse_line,
+    "nginx": NginxParser().parse_line,
+    "apache": ApacheParser().parse_line,
+    # "postgres": PostgresParser().parse_line,  # Uncomment if exists
+    "syslog": SyslogParser().parse_line,
+    "generic": GenericParser().parse_line,
 }
 
 
@@ -39,7 +39,8 @@ class ParserManager:
         parser = self.parsers.get(log_type)
         if not parser:
             log(f"No parser found for type '{log_type}', using generic parser.", level="WARNING")
-            parser = generic_parser.parse
+            from parsers.generic import GenericParser
+            parser = GenericParser().parse_line
 
         try:
             parsed = parser(line)

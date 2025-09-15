@@ -21,7 +21,8 @@ class NginxParser:
     def parse_line(line: str) -> Optional[Dict]:
         match = NginxParser.COMBINED_REGEX.match(line)
         if not match:
-            log(f"Failed to parse Nginx line: {line}", level="WARN")
+            from core.logger import LogLevel
+            log(f"Failed to parse Nginx line: {line}", level=LogLevel.WARNING)
             return None
 
         data = match.groupdict()
